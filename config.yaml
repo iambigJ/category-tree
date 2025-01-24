@@ -3,6 +3,8 @@ database:
   host: 'localhost'
   port: 3306
   username: 'root'
-  password: 'root'
-  database: 'test'
+  password: 'mysql'
+  database: 'mysql'
   synchronize: true
+
+HTTP_PORT: 3003

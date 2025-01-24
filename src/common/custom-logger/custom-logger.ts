@@ -30,7 +30,4 @@ export class MyLogger extends ConsoleLogger {
     }
   }
 
-  // else {
-  //   super.error('📢 ' + message, ...args);
-  // }
 }

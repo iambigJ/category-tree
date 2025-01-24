@@ -1,4 +1,6 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateCatDto } from './create-cat.dto';
+import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { CreateCategoryDto } from './create-cat.dto';
 
-export class UpdateCatDto extends PartialType(CreateCatDto) {}
+export class UpdateCategoryDto extends PartialType(
+  OmitType(CreateCategoryDto, ['parentId']),
+) {}

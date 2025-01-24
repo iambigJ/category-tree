@@ -2,30 +2,26 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  OneToMany,
   Tree,
   TreeChildren,
   TreeParent,
 } from 'typeorm';
-import { CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
 @Tree('closure-table')
 export class Category {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: '32' })
   title: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'varchar', length: 32 })
   description: string;
 
   @TreeChildren()
-  parrentId: Category[];
+  subCategories: Category[];
 
   @TreeParent()
   parent: Category;
-
 }

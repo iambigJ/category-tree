@@ -2,6 +2,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { DataSourceOptions } from 'typeorm';
 import { DynamicModule } from '@nestjs/common';
+import {Category} from "../../modules/category/entities/category.entity";
 
 export function typeormConfig(): DynamicModule {
   return TypeOrmModule.forRootAsync({
@@ -15,7 +16,9 @@ export function typeormConfig(): DynamicModule {
         username: mytypeormConfig['username'],
         password: mytypeormConfig['password'],
         database: mytypeormConfig['database'],
-        entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+        migrations: [app.root + '/../migrations/*{.ts,.js}'], // Important: Point to your migrations folder
+
+        entities: [Category],
         synchronize: mytypeormConfig['synchronize'] || true,
       };
     },

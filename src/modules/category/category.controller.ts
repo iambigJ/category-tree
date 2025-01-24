@@ -6,37 +6,61 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
+  ParseIntPipe,
   Put,
+  ParseUUIDPipe,
 } from '@nestjs/common';
-// import { CatService } from './cat.service';
-import { CreateCatDto } from './dto/create-cat.dto';
-import { UpdateCatDto } from './dto/update-cat.dto';
+import { CategoryService } from './category.service';
+import { CreateCategoryDto } from './dto/create-cat.dto';
+import { UpdateCategoryDto } from './dto/update-cat.dto';
+import { Category } from './entities/category.entity';
+import { MoveCategoryDto } from './dto/move-cat.dto';
 
 @Controller('category')
 export class CategoryController {
-  constructor() {}
+  constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  create(@Body() createCatDto: CreateCatDto) {}
+  create(@Body() createCategoryDto: CreateCategoryDto) {
+    return this.categoryService.create(createCategoryDto);
+  }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCatDto: UpdateCatDto) {}
-
-  @Get(':id')
-  findAll(
-    @Query('limit') limit: string,
-    @Query('param') param: string,
-    @Param('table') table: string,
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    // return this.catService.findAll();
+    return await this.categoryService.update(id, updateCategoryDto);
+  }
+
+  @Put(':id')
+  async moveCategory(
+    @Param('id', ParseUUIDPipe) categoryId: string,
+    @Body() moveCategoryDto: MoveCategoryDto,
+  ) {
+    return this.categoryService.moveCategory(
+      categoryId,
+      moveCategoryDto.parrentId,
+    );
+  }
+
+  @Get('findAll')
+  findCategoryTree(): Promise<Category[]> {
+    return this.categoryService.findCategoryTree();
+  }
+
+  @Get('subcategories/:id')
+  findSubcategories(@Param('id') id: string): Promise<Category> {
+    return this.categoryService.findSubcategories(id);
   }
 
   @Get(':id')
-  findOne(@Param('recursive') rec: string) {
+  findSubCategoriesFlat(@Param('id') id: string): Promise<Category> {
+    return this.categoryService.findOne(id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.categoryService.remove(id);
   }
 }
