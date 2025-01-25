@@ -19,15 +19,6 @@ export class MyLogger extends ConsoleLogger {
   }
 
   error(message: string, ...optionalParams: any[]) {
-    const [context, ...args] = optionalParams;
-
-    if (args.length > 0 && typeof args[0] === 'string') {
-      super.error('📢 ' + message, args[0], context, ...args.slice(1));
-    } else if (context) {
-      super.error('📢 ' + message, '', context, ...args);
-    } else {
-      super.error('📢 ' + message, ...args);
-    }
+    super.error('📢 ' + message, ...optionalParams);
   }
-
 }

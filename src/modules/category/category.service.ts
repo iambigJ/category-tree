@@ -72,7 +72,7 @@ export class CategoryService {
 
   async findFlat(id: string) {
     this.logger.log('find all categories decentent');
-    return this.categoryRepository.findDecendant(id).catch((e) => {
+    return this.categoryRepository.findDescendant(id).catch((e) => {
       this.logger.error('error getting decendant', e?.stack);
       throw new UnprocessableEntityException(e?.message);
     });
@@ -81,7 +81,7 @@ export class CategoryService {
   async findOne(id: string): Promise<Category> {
     this.logger.log(`Finding category with ID: ${id}`);
     try {
-      const category = await this.categoryRepository.findCategoryById( id );
+      const category = await this.categoryRepository.findCategoryById(id);
 
       if (!category) {
         this.logger.warn(`Category with ID ${id} not found`);
