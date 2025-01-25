@@ -96,7 +96,7 @@ export class CategoryRepository extends Repository<Category> {
     );
   }
 
-  async findDecendant(id: string) {
+  async findDescendant(id: string) {
     return this.treeRepository.findDescendants(await this.findCategoryById(id));
   }
 

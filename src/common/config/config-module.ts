@@ -6,8 +6,6 @@ import * as path from 'path';
 import * as appRoot from 'app-root-path';
 
 const configFilePath = path.join(appRoot.path, 'config.yaml');
-console.log('config file path is')
-console.log(configFilePath)
 const configYaml = yaml.parse(fs.readFileSync(configFilePath, 'utf8'));
 
 @Module({
