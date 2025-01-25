@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
   Put,
   ParseUUIDPipe,
 } from '@nestjs/common';
@@ -25,14 +24,6 @@ export class CategoryController {
     return this.categoryService.create(createCategoryDto);
   }
 
-  @Patch(':id')
-  async update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateCategoryDto: UpdateCategoryDto,
-  ) {
-    return await this.categoryService.update(id, updateCategoryDto);
-  }
-
   @Put(':id')
   async moveCategory(
     @Param('id', ParseUUIDPipe) categoryId: string,
@@ -43,8 +34,24 @@ export class CategoryController {
       moveCategoryDto.parrentId,
     );
   }
+  @Delete(':id')
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.categoryService.remove(id);
+  }
 
-  @Get('findAll')
+  @Patch(':id')
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
+    return await this.categoryService.update(id, updateCategoryDto);
+  }
+  @Get(':id')
+  findOne(@Param('id', ParseUUIDPipe) categoryId: string): Promise<Category> {
+    return this.categoryService.findOne(categoryId);
+  }
+
+  @Get('tree/findAll')
   findCategoryTree(): Promise<Category[]> {
     return this.categoryService.findCategoryTree();
   }
@@ -54,13 +61,8 @@ export class CategoryController {
     return this.categoryService.findSubcategories(id);
   }
 
-  @Get(':id')
-  findSubCategoriesFlat(@Param('id') id: string): Promise<Category> {
-    return this.categoryService.findOne(id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.categoryService.remove(id);
+  @Get('flat/:id')
+  findSubCategoriesFlat(@Param('id') id: string): Promise<Category[]> {
+    return this.categoryService.findFlat(id);
   }
 }

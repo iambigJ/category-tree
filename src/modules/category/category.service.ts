@@ -7,7 +7,7 @@ import { CreateCategoryDto } from './dto/create-cat.dto';
 import { CategoryRepository } from './category.repository';
 import { Category } from './entities/category.entity';
 import { MyLogger } from '../../common/custom-logger/custom-logger';
-import { UpdateCategoryDto } from './dto/update-cat.dto'; // Update with your logger path
+import { UpdateCategoryDto } from './dto/update-cat.dto';
 
 @Injectable()
 export class CategoryService {
@@ -49,10 +49,10 @@ export class CategoryService {
   async moveCategory(id: string, parrentId: string) {
     this.logger.debug('start move parrent category', { id, parrentId });
     return await this.categoryRepository
-      .moveCategory(id, parrentId)
+      .moveCategoryParent(id, parrentId)
       .catch((e) => {
         this.logger.error(
-          'error on move parrent category',
+          'error on move parent category',
           e?.stack,
           e?.message,
         );
@@ -70,31 +70,41 @@ export class CategoryService {
       });
   }
 
-  async findOne(id: string): Promise<Category> {
-    this.logger.log(`Finding category with ID: ${id}`);
-    return this.categoryRepository
-      .findCategoryById(id)
-      .then((category) => {
-        if (!category) {
-          this.logger.warn(`Category with ID ${id} not found`);
-          throw new NotFoundException(`Category with ID ${id} not found`);
-        }
-        this.logger.log(`Found category: ${JSON.stringify(category)}`);
-        return category;
-      })
-      .catch((error) => {
-        this.logger.error(
-          `Error finding category with ID ${id}: ${error.message}`,
-          error.stack,
-        );
-        throw error; // Re-throw the original error to maintain the correct exception type (NotFoundException or other errors from the repository)
-      });
+  async findFlat(id: string) {
+    this.logger.log('find all categories decentent');
+    return this.categoryRepository.findDecendant(id).catch((e) => {
+      this.logger.error('error getting decendant', e?.stack);
+      throw new UnprocessableEntityException(e?.message);
+    });
   }
 
-  async remove(id: number): Promise<void> {
+  async findOne(id: string): Promise<Category> {
+    this.logger.log(`Finding category with ID: ${id}`);
+    try {
+      const category = await this.categoryRepository.findCategoryById( id );
+
+      if (!category) {
+        this.logger.warn(`Category with ID ${id} not found`);
+        throw new NotFoundException(`Category with ID ${id} not found`);
+      }
+      return category;
+    } catch (error) {
+      this.logger.error(
+        `Error finding category with ID ${id}: ${error.message}`,
+        error.stack,
+      );
+      if (error instanceof NotFoundException) {
+        throw error; // Re-throw NotFoundException
+      } else {
+        throw new UnprocessableEntityException('Error finding category');
+      }
+    }
+  }
+
+  async remove(id: string): Promise<void> {
     this.logger.log(`Removing category with ID ${id}`);
     return this.categoryRepository
-      .delete(id) // Assuming you add a deleteCategory method in the repository
+      .removeCategory(id)
       .then(() => {
         this.logger.log(`Category with ID ${id} removed successfully`);
       })
@@ -124,11 +134,6 @@ export class CategoryService {
         );
         throw error;
       });
-  }
-
-  async findSubCategoryFlat() {
-    this.logger.log('find all decendent category')
-    return this.categoryRepository.findDescendants()
   }
 
   async findSubcategories(id: string): Promise<Category> {

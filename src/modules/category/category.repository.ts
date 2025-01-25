@@ -4,6 +4,7 @@ import {
   Repository,
   TreeRepository,
   FindManyOptions,
+  QueryRunner,
 } from 'typeorm';
 import { Category } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-cat.dto';
@@ -12,7 +13,7 @@ import { UpdateCategoryDto } from './dto/update-cat.dto';
 @Injectable()
 export class CategoryRepository extends Repository<Category> {
   private readonly treeRepository: TreeRepository<Category>;
-
+  //using typeorm is not efficient i think using raw query is more efficient and using recursive cte
   constructor(private dataSource: DataSource) {
     super(Category, dataSource.createEntityManager());
     this.treeRepository = dataSource.manager.getTreeRepository(Category);
@@ -34,6 +35,13 @@ export class CategoryRepository extends Repository<Category> {
     return this.save(category);
   }
 
+  async removeCategory(categoryId: string) {
+    const res = await this.delete(categoryId);
+    if (res?.affected == 0) {
+      throw new Error('Not Found Entity');
+    }
+  }
+
   async updateCategory(
     id: string,
     updateCategoryDto: UpdateCategoryDto,
@@ -45,40 +53,37 @@ export class CategoryRepository extends Repository<Category> {
     Object.assign(category, updateCategoryDto);
     return this.save(category);
   }
-  // Move a category to a new parent
 
-  async moveCategory(categoryId: string, parentId: string): Promise<Category> {
-    return await this.dataSource.transaction(async () => {
-      // No need for manager parameter
-
-      const category = await this.treeRepository.findOne({
-        // Use this.treeRepository
+  async moveCategoryParent(
+    categoryId: string,
+    newParentId: string | null,
+  ): Promise<void> {
+    await this.dataSource.transaction(async (manager) => {
+      const child = await manager.getTreeRepository(Category).findOne({
         where: { id: categoryId },
         relations: ['parent'],
       });
 
-      if (!category) {
-        throw new NotFoundException(`Category with ID ${categoryId} not found`);
+      if (!child) {
+        throw new Error(`Category (child) with ID '${categoryId}' not found`);
       }
 
-      if (parentId === null) {
-        category.parent = null;
-      } else {
-        const newParent = await this.treeRepository.findOneBy({ id: parentId }); // Use this.treeRepository
-        if (!newParent) {
-          throw new NotFoundException(
-            `Parent category with ID ${parentId} not found`,
+      let parentCategory: Category | null = null;
+      if (newParentId) {
+        parentCategory = await manager.getTreeRepository(Category).findOne({
+          where: { id: newParentId },
+        });
+        if (!parentCategory) {
+          throw new Error(
+            `Category (parent) with ID '${newParentId}' not found`,
           );
         }
-        category.parent = newParent;
       }
 
-      return await this.treeRepository.save(category); // Use this.treeRepository
-    });
-  }
+      child.parent = parentCategory || null;
 
-  async findDescendants(id: string): Promise<Category[]> {
-    return await this.treeRepository.findDescendants(await this.fi);
+      await manager.getTreeRepository(Category).save(child);
+    });
   }
 
   async findTrees() {
@@ -89,6 +94,10 @@ export class CategoryRepository extends Repository<Category> {
     return this.treeRepository.findDescendantsTree(
       await this.findCategoryById(id),
     );
+  }
+
+  async findDecendant(id: string) {
+    return this.treeRepository.findDescendants(await this.findCategoryById(id));
   }
 
   async findAllCategories(limit: number, offset: number): Promise<Category[]> {
@@ -103,26 +112,7 @@ export class CategoryRepository extends Repository<Category> {
   async findCategoryById(id: string): Promise<Category> {
     return this.findOne({
       where: { id },
-      relations: ['parent'],
+      relations: ['parent', 'subCategories'],
     });
-  }
-
-  // Method to get all children (descendants) associated with a tree
-  async findAllDescendantsTree(category: Category): Promise<Category> {
-    return await this.treeRepository.findDescendantsTree(category);
-  }
-
-  myFind(id: string): Promise<Category | null> {
-    return this.findOne({
-      where: {
-        id: id,
-      },
-      relations: ['parent'],
-    });
-  }
-
-  // Method to get all parents (ancestors) associated with a tree
-  async findAllAncestorsTree(category: Category): Promise<Category> {
-    return await this.treeRepository.findAncestorsTree(category);
   }
 }
