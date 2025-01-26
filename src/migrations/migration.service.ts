@@ -13,7 +13,9 @@ export class MigrationService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    this.logger.log('')
+    this.logger.log(
+      'evolution has a destination not to combat nature but to supersede it  ',
+    );
     await this.runMigrations();
   }
 
@@ -26,7 +28,6 @@ export class MigrationService implements OnModuleInit {
         })
         .catch((e) => {
           this.logger.error('Migration failed:', e?.stack, e.message);
-
           throw new UnknownModuleException(e?.message);
         });
     }
