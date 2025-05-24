@@ -177,4 +177,36 @@ export class CategoryService {
       throw new UnprocessableEntityException(error?.message);
     });
   }
+
+  async removeWithChildren(id: string): Promise<void> {
+    this.logger.log(`Removing category with ID ${id} and all its children`);
+    return this.categoryRepository
+      .removeCategoryWithChildren(id)
+      .then(() => {
+        this.logger.log(`Category with ID ${id} and its children removed successfully`);
+      })
+      .catch((error) => {
+        this.logger.error(
+          `Error removing category with ID ${id} and its children: ${error.message}`,
+          error.stack,
+        );
+        throw error;
+      });
+  }
+
+  async removeKeepChildren(id: string): Promise<void> {
+    this.logger.log(`Removing category with ID ${id} while keeping its children`);
+    return this.categoryRepository
+      .removeCategoryKeepChildren(id)
+      .then(() => {
+        this.logger.log(`Category with ID ${id} removed successfully, children preserved`);
+      })
+      .catch((error) => {
+        this.logger.error(
+          `Error removing category with ID ${id} while keeping children: ${error.message}`,
+          error.stack,
+        );
+        throw error;
+      });
+  }
 }

@@ -41,6 +41,16 @@ export class CategoryController {
     return this.categoryService.remove(id);
   }
 
+  @Delete(':id/with-children')
+  removeWithChildren(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.categoryService.removeWithChildren(id);
+  }
+
+  @Delete(':id/keep-children')
+  removeKeepChildren(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.categoryService.removeKeepChildren(id);
+  }
+
   @Patch(':id')
   async update(
     @Param('id', ParseUUIDPipe) id: string,

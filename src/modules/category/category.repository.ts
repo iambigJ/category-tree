@@ -151,4 +151,38 @@ export class CategoryRepository extends Repository<Category> {
 
     return category;
   }
+
+  async removeCategoryWithChildren(categoryId: string): Promise<void> {
+    const result = await this.treeRepository.delete(categoryId);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Category with ID ${categoryId} not found`);
+    }
+  }
+
+  async removeCategoryKeepChildren(categoryId: string): Promise<void> {
+    await this.dataSource.transaction(async (manager) => {
+      const category = await manager.getTreeRepository(Category).findOne({
+        where: { id: categoryId },
+        relations: ['subCategories'],
+      });
+
+      if (!category) {
+        throw new NotFoundException(`Category with ID ${categoryId} not found`);
+      }
+
+      // Get all direct children
+      const children = await manager.getTreeRepository(Category).findDescendants(category, {
+        depth: 1,
+      });
+
+      // Remove the parent reference from all direct children
+      for (const child of children) {
+        child.parent = null;
+        await manager.getTreeRepository(Category).save(child);
+      }
+
+      // Now delete the category
+      await manager.getTreeRepository(Category).delete(categoryId);
+    });
+  }
 }
