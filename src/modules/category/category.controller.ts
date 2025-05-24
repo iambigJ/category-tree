@@ -8,6 +8,8 @@ import {
   Delete,
   Put,
   ParseUUIDPipe,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-cat.dto';
@@ -56,13 +58,29 @@ export class CategoryController {
     return this.categoryService.findCategoryTree();
   }
 
+  @Get('ancestors/:id')
+  findAncestors(@Param('id', ParseUUIDPipe) id: string): Promise<Category[]> {
+    return this.categoryService.findAncestors(id);
+  }
+
+  @Get('ancestors-tree/:id')
+  findAncestorsTree(@Param('id', ParseUUIDPipe) id: string): Promise<Category> {
+    return this.categoryService.findAncestorsTree(id);
+  }
+
   @Get('subcategories/:id')
-  findSubcategories(@Param('id') id: string): Promise<Category> {
-    return this.categoryService.findSubcategories(id);
+  findSubcategories(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('depth', new ParseIntPipe({ optional: true })) depth?: number,
+  ): Promise<Category> {
+    return this.categoryService.findSubcategories(id, depth);
   }
 
   @Get('flat/:id')
-  findSubCategoriesFlat(@Param('id') id: string): Promise<Category[]> {
-    return this.categoryService.findFlat(id);
+  findSubCategoriesFlat(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('depth', new ParseIntPipe({ optional: true })) depth?: number,
+  ): Promise<Category[]> {
+    return this.categoryService.findFlat(id, depth);
   }
 }

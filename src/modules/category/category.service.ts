@@ -60,7 +60,7 @@ export class CategoryService {
       });
   }
 
-  async findAll(limit: number, offset: number): Promise<Category[]> {
+  async findAll(limit: number, offset: number): Promise<[Category[], number]> {
     this.logger.log(`Finding all categories`, { limit, offset });
     return await this.categoryRepository
       .findAllCategories(limit, offset)
@@ -70,11 +70,16 @@ export class CategoryService {
       });
   }
 
-  async findFlat(id: string) {
-    this.logger.log('find all categories decentent');
-    return this.categoryRepository.findDescendant(id).catch((e) => {
-      this.logger.error('error getting decendant', e?.stack);
-      throw new UnprocessableEntityException(e?.message);
+  async findFlat(id: string, depth?: number): Promise<Category[]> {
+    this.logger.log(
+      `Finding flat descendants for category with ID ${id} with depth ${depth || 'unlimited'}`,
+    );
+    return this.categoryRepository.findDescendants(id, depth).catch((error) => {
+      this.logger.error(
+        `Error finding flat descendants for category with ID ${id}: ${error.message}`,
+        error.stack,
+      );
+      throw new UnprocessableEntityException(error?.message);
     });
   }
 
@@ -136,22 +141,40 @@ export class CategoryService {
       });
   }
 
-  async findSubcategories(id: string): Promise<Category> {
-    this.logger.log(`Finding subcategories for category with ID ${id}`);
+  async findSubcategories(id: string, depth?: number): Promise<Category> {
+    this.logger.log(
+      `Finding subcategories for category with ID ${id} with depth ${depth || 'unlimited'}`,
+    );
     return this.categoryRepository
-      .findDescendantsTree(id)
-      .then((subcategories) => {
-        this.logger.log(
-          `Found subcategories: ${JSON.stringify(subcategories)}`,
-        );
-        return subcategories;
-      })
+      .findDescendantsTree(id, depth)
       .catch((error) => {
         this.logger.error(
           `Error finding subcategories for category with ID ${id}: ${error.message}`,
           error.stack,
         );
-        throw new UnprocessableEntityException();
+        throw new UnprocessableEntityException(error?.message);
       });
+  }
+
+  async findAncestors(id: string): Promise<Category[]> {
+    this.logger.log(`Finding ancestors for category with ID ${id}`);
+    return this.categoryRepository.findAncestors(id).catch((error) => {
+      this.logger.error(
+        `Error finding ancestors for category with ID ${id}: ${error.message}`,
+        error.stack,
+      );
+      throw new UnprocessableEntityException(error?.message);
+    });
+  }
+
+  async findAncestorsTree(id: string): Promise<Category> {
+    this.logger.log(`Finding ancestors tree for category with ID ${id}`);
+    return this.categoryRepository.findAncestorsTree(id).catch((error) => {
+      this.logger.error(
+        `Error finding ancestors tree for category with ID ${id}: ${error.message}`,
+        error.stack,
+      );
+      throw new UnprocessableEntityException(error?.message);
+    });
   }
 }
