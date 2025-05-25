@@ -106,21 +106,6 @@ export class CategoryService {
     }
   }
 
-  async remove(id: string): Promise<void> {
-    this.logger.log(`Removing category with ID ${id}`);
-    return this.categoryRepository
-      .removeCategory(id)
-      .then(() => {
-        this.logger.log(`Category with ID ${id} removed successfully`);
-      })
-      .catch((error) => {
-        this.logger.error(
-          `Error removing category with ID ${id}: ${error.message}`,
-          error.stack,
-        );
-        throw error;
-      });
-  }
 
   async findCategoryTree(): Promise<Category[]> {
     this.logger.log('Finding category tree');

@@ -36,10 +36,6 @@ export class CategoryController {
       moveCategoryDto.parrentId,
     );
   }
-  @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
-    return this.categoryService.remove(id);
-  }
 
   @Delete(':id/with-children')
   removeWithChildren(@Param('id', ParseUUIDPipe) id: string): Promise<void> {

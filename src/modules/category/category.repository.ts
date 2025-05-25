@@ -42,12 +42,7 @@ export class CategoryRepository extends Repository<Category> {
     return this.save(category);
   }
 
-  async removeCategory(categoryId: string): Promise<void> {
-    const result = await this.treeRepository.delete(categoryId);
-    if (result.affected === 0) {
-      throw new NotFoundException(`Category with ID ${categoryId} not found`);
-    }
-  }
+
 
   async updateCategory(
     id: string,
