@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: category-tree-app
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=development
+      - DATA_BASE_HOST=mysql
+      - DATA_BASE_PORT=3306
+      - DATA_BASE_USERNAME=category_user
+      - DATA_BASE_PASSWORD=category_password
+      - DATA_BASE_DATABASE=category_db
+      - DATA_BASE_SYNCHRONIZE=false
+      - DATA_BASE_LOGGING=true
+      - DATA_BASE_MIGRATIONSRUN=true
+      - MIGRATION=true
+      - HTTP_PORT=3003
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - category-network
+    command: sh -c "npm run migration:run && npm run start:dev"
+
+  mysql:
+    image: mysql:8.0
+    container_name: category-tree-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=category_db
+      - MYSQL_USER=category_user
+      - MYSQL_PASSWORD=category_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./migrations:/docker-entrypoint-initdb.d
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - category-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql-data:
+    driver: local
+
+networks:
+  category-network:
+    driver: bridge
