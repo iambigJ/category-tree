@@ -1,12 +1,15 @@
-
 DATA_BASE:
   host: 'localhost'
   port: 3306
-  username: 'root'
-  password: 'mysql'
-  database: 'mysql'
+  username: 'category_user'
+  password: 'category_password'
+  database: 'category_db'
   synchronize: false
+  logging: true
+  migrationsRun: true
 
 HTTP_PORT: 3003
 
 MIGRATION: true
+
+NODE_ENV: development
