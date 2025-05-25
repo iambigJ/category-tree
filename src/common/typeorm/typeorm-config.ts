@@ -18,7 +18,6 @@ export function typeormConfig(): DynamicModule {
         username: mytypeormConfig['username'],
         password: mytypeormConfig['password'],
         database: mytypeormConfig['database'],
-        migrations: [join(appRoot.path, './migrations', '*.migration.js')],
         entities: [Category],
         synchronize: false,
       };
