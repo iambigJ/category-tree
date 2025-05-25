@@ -1,0 +1,303 @@
+{
+  "info": {
+    "name": "Category Tree API",
+    "description": "API collection for managing hierarchical category tree",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/category",
+              "host": ["{{base_url}}"],
+              "path": ["category"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Electronics\",\n    \"description\": \"Electronic devices and accessories\",\n    \"parentId\": null\n}"
+            },
+            "description": "Create a new category. If parentId is provided, the category will be created as a child of the specified parent."
+          }
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/category/:id",
+              "host": ["{{base_url}}"],
+              "path": ["category", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123e4567-e89b-12d3-a456-426614174000",
+                  "description": "Category UUID"
+                }
+              ]
+            },
+            "description": "Get a single category by its ID"
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/category/:id",
+              "host": ["{{base_url}}"],
+              "path": ["category", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123e4567-e89b-12d3-a456-426614174000",
+                  "description": "Category UUID"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Updated Electronics\",\n    \"description\": \"Updated description\"\n}"
+            },
+            "description": "Update a category's properties"
+          }
+        },
+        {
+          "name": "Move Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/category/:id",
+              "host": ["{{base_url}}"],
+              "path": ["category", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123e4567-e89b-12d3-a456-426614174000",
+                  "description": "Category UUID"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"parrentId\": \"456e4567-e89b-12d3-a456-426614174000\"\n}"
+            },
+            "description": "Move a category under a new parent"
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/category/:id",
+              "host": ["{{base_url}}"],
+              "path": ["category", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123e4567-e89b-12d3-a456-426614174000",
+                  "description": "Category UUID"
+                }
+              ]
+            },
+            "description": "Delete a category"
+          }
+        },
+        {
+          "name": "Delete Category with Children",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/category/:id/with-children",
+              "host": ["{{base_url}}"],
+              "path": ["category", ":id", "with-children"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123e4567-e89b-12d3-a456-426614174000",
+                  "description": "Category UUID"
+                }
+              ]
+            },
+            "description": "Delete a category and all its children"
+          }
+        },
+        {
+          "name": "Delete Category Keep Children",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/category/:id/keep-children",
+              "host": ["{{base_url}}"],
+              "path": ["category", ":id", "keep-children"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123e4567-e89b-12d3-a456-426614174000",
+                  "description": "Category UUID"
+                }
+              ]
+            },
+            "description": "Delete a category but keep its children (they become root categories)"
+          }
+        },
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/category?limit=10&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["category"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of items per page"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Page offset"
+                }
+              ]
+            },
+            "description": "Get paginated list of all categories"
+          }
+        },
+        {
+          "name": "Get Category Tree",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/category/tree/findAll",
+              "host": ["{{base_url}}"],
+              "path": ["category", "tree", "findAll"]
+            },
+            "description": "Get the entire category tree structure"
+          }
+        },
+        {
+          "name": "Get Subcategories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/category/subcategories/:id?depth=2",
+              "host": ["{{base_url}}"],
+              "path": ["category", "subcategories", ":id"],
+              "query": [
+                {
+                  "key": "depth",
+                  "value": "2",
+                  "description": "Maximum depth of subcategories to fetch (optional)"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123e4567-e89b-12d3-a456-426614174000",
+                  "description": "Category UUID"
+                }
+              ]
+            },
+            "description": "Get subcategories of a category in tree structure"
+          }
+        },
+        {
+          "name": "Get Flat Descendants",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/category/flat/:id?depth=2",
+              "host": ["{{base_url}}"],
+              "path": ["category", "flat", ":id"],
+              "query": [
+                {
+                  "key": "depth",
+                  "value": "2",
+                  "description": "Maximum depth of descendants to fetch (optional)"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123e4567-e89b-12d3-a456-426614174000",
+                  "description": "Category UUID"
+                }
+              ]
+            },
+            "description": "Get all descendants of a category in a flat list"
+          }
+        },
+        {
+          "name": "Get Ancestors",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/category/ancestors/:id",
+              "host": ["{{base_url}}"],
+              "path": ["category", "ancestors", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123e4567-e89b-12d3-a456-426614174000",
+                  "description": "Category UUID"
+                }
+              ]
+            },
+            "description": "Get all ancestors of a category in a flat list"
+          }
+        },
+        {
+          "name": "Get Ancestors Tree",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/category/ancestors-tree/:id",
+              "host": ["{{base_url}}"],
+              "path": ["category", "ancestors-tree", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123e4567-e89b-12d3-a456-426614174000",
+                  "description": "Category UUID"
+                }
+              ]
+            },
+            "description": "Get ancestors of a category in tree structure"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3003",
+      "type": "string"
+    }
+  ]
+} 
